@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as mp
+import matplotlib.patches as legend
 from math import log2,fabs
 
 def rightRect(f,x,h):
@@ -8,7 +9,7 @@ def rightRect(f,x,h):
 def middleRect(f,x,h):
     return f(x + h/2)
 
-def Simpsons(f,x,h):
+def Simpson(f,x,h):
     return (f(x) + 4 * f(x + h / 2) + f(x + h)) / 6.0
 
 def integration(f,a,b,n,rule):
@@ -23,20 +24,18 @@ a=0.
 b=12.
 
 
-IRR=[integration(np.sin,a,b,n[i],rightRect) for i in range(0,len(n))]
-IMR=[integration(np.sin,a,b,n[i],middleRect) for i in range(0,len(n))]
-# ISM=[Simpson(np.sin,a,b,n[i]) for i in range(0,len(n))]
-ISM2=[integration(np.sin,a,b,n[i],Simpsons) for i in range(0,len(n))]
+Right = [log2(fabs(integration(np.sin,a,b,n[i],rightRect)-I)) for i in range(0,len(n))]
+Middle = [log2(fabs(integration(np.sin,a,b,n[i],middleRect)-I)) for i in range(0,len(n))]
+Sim = [log2(fabs(integration(np.sin,a,b,n[i],Simpson)-I)) for i in range(0,len(n))]
 
-YR=[log2(fabs(IRR[i] - I)) for i in range(0,len(n))]
-YM=[log2(fabs(IMR[i] - I)) for i in range(0,len(n))]
-YS2=[log2(fabs(ISM2[i] - I)) for i in range(0,len(n))]
-
-
-mp.xlabel("i")
+mp.xlabel("iterations")
 mp.ylabel("log2(I-I*)")
-mp.plot(x,YR,color="r",)
-mp.plot(x,YM,color="b")
-mp.plot(x,YS2,color="g")
-mp.grid(True)
+mp.plot(x,Right,color="r",label="RightRect")
+mp.plot(x,Middle,color="lightblue")
+mp.plot(x,Sim,color="g")
+
+mp.legend(handles = [legend.Patch(color="r",label="Right Rect"),
+                     legend.Patch(color="lightblue", label="Middle Rect"),
+                     legend.Patch(color="g", label="Simpson")])
+
 mp.show()
